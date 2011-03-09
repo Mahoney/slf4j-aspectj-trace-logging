@@ -1,6 +1,6 @@
 package uk.org.lidalia.logging.test;
 
-import uk.org.lidalia.logging.trace.Secure;
+import uk.org.lidalia.lang.Secure;
 
 public class ClassToBeTraced {
 	

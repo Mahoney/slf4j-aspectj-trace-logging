@@ -23,6 +23,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.org.lidalia.lang.Secure;
+
 public aspect TraceAspect {
 	
 	pointcut externalClasses()					: !within(org.aspectj..*) && !within(uk.org.lidalia.logging.trace..*);
