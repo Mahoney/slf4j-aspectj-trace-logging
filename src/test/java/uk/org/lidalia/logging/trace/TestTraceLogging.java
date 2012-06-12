@@ -1,5 +1,6 @@
 package uk.org.lidalia.logging.trace;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.*;
 import static uk.org.lidalia.slf4jtest.LoggingEvent.trace;
 
@@ -26,33 +27,32 @@ public class TestTraceLogging {
 	public void testLogStatementsFromMethod() {
 		testInstance.simpleMethod();
 
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.simpleMethod");
-        assertEquals(trace("> {aToStringValue}.simpleMethod()"), loggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.simpleMethod"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+        assertEquals(asList(
+                trace("> {aToStringValue}.simpleMethod()"),
+                trace("< {aToStringValue}.simpleMethod")),
+                getLoggingEvents("simpleMethod"));
     }
 
 	@Test
 	public void testLogStatementsFromStaticMethod() {
 		ClassToBeTraced.simpleStaticMethod();
 
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.simpleStaticMethod");
-		assertEquals(trace("> simpleStaticMethod()"), loggingEvents.get(0));
-		assertEquals(trace("< simpleStaticMethod"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+        assertEquals(asList(
+                trace("> simpleStaticMethod()"),
+                trace("< simpleStaticMethod")),
+                getLoggingEvents("simpleStaticMethod"));
     }
 
 	@Test
 	public void testRuntimeExceptionLogStatements() {
-
 		try {
 			testInstance.runtimeExceptionMethod();
 		} catch (RuntimeException re) {}
 
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.runtimeExceptionMethod");
-		assertEquals(trace("> {aToStringValue}.runtimeExceptionMethod()"), loggingEvents.get(0));
-		assertEquals(trace("! {aToStringValue}.runtimeExceptionMethod threw exception java.lang.RuntimeException: message at line 29"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+        assertEquals(asList(
+                trace("> {aToStringValue}.runtimeExceptionMethod()"),
+                trace("! {aToStringValue}.runtimeExceptionMethod threw exception java.lang.RuntimeException: message at line 29")),
+                getLoggingEvents("runtimeExceptionMethod"));
     }
 
 	@Test
@@ -60,85 +60,93 @@ public class TestTraceLogging {
 		try {
 			testInstance.exceptionMethod();
 		} catch (Exception e) {}
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.exceptionMethod");
-		assertEquals(trace("> {aToStringValue}.exceptionMethod()"), loggingEvents.get(0));
-		assertEquals(trace("! {aToStringValue}.exceptionMethod threw exception java.lang.Exception: message at line 33"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.exceptionMethod()"),
+                trace("! {aToStringValue}.exceptionMethod threw exception java.lang.Exception: message at line 33")),
+                getLoggingEvents("exceptionMethod"));
     }
 
 	@Test
 	public void testAllVisibilitiesOfMethodsLogged() {
 		testInstance.publicMethod();
-        List<LoggingEvent> publicMethodLoggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.publicMethod");
-        List<LoggingEvent> protectedMethodLoggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.protectedMethod");
-        List<LoggingEvent> defaultMethodLoggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.defaultMethod");
-        List<LoggingEvent> privateMethodLoggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.privateMethod");
-		assertEquals(trace("> {aToStringValue}.publicMethod()"), publicMethodLoggingEvents.get(0));
-		assertEquals(trace("> {aToStringValue}.protectedMethod()"), protectedMethodLoggingEvents.get(0));
-		assertEquals(trace("> {aToStringValue}.defaultMethod()"), defaultMethodLoggingEvents.get(0));
-		assertEquals(trace("> {aToStringValue}.privateMethod()"), privateMethodLoggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.privateMethod"), privateMethodLoggingEvents.get(1));
-		assertEquals(trace("< {aToStringValue}.defaultMethod"), defaultMethodLoggingEvents.get(1));
-		assertEquals(trace("< {aToStringValue}.protectedMethod"), protectedMethodLoggingEvents.get(1));
-		assertEquals(trace("< {aToStringValue}.publicMethod"), publicMethodLoggingEvents.get(1));
-        assertEquals(2, publicMethodLoggingEvents.size());
-        assertEquals(2, protectedMethodLoggingEvents.size());
-        assertEquals(2, defaultMethodLoggingEvents.size());
-        assertEquals(2, privateMethodLoggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.publicMethod()"),
+                trace("< {aToStringValue}.publicMethod")),
+                getLoggingEvents("publicMethod"));
+		assertEquals(asList(
+                trace("> {aToStringValue}.protectedMethod()"),
+                trace("< {aToStringValue}.protectedMethod")),
+                getLoggingEvents("protectedMethod"));
+		assertEquals(asList(
+                trace("> {aToStringValue}.defaultMethod()"),
+                trace("< {aToStringValue}.defaultMethod")),
+                getLoggingEvents("defaultMethod"));
+		assertEquals(asList(
+                trace("> {aToStringValue}.privateMethod()"),
+                trace("< {aToStringValue}.privateMethod")),
+                getLoggingEvents("privateMethod"));
     }
 
 	@Test
 	public void testParametersLogged() {
 		testInstance.methodWithParameters("hello", 5);
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.methodWithParameters");
-		assertEquals(trace("> {aToStringValue}.methodWithParameters(s=hello, i=5)"), loggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.methodWithParameters"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.methodWithParameters(s=hello, i=5)"),
+                trace("< {aToStringValue}.methodWithParameters")),
+                getLoggingEvents("methodWithParameters"));
     }
 
 	@Test
 	public void testNullParametersHandledOK() {
 		testInstance.methodWithParameters(null, 5);
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.methodWithParameters");
-		assertEquals(trace("> {aToStringValue}.methodWithParameters(s=null, i=5)"), loggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.methodWithParameters"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.methodWithParameters(s=null, i=5)"),
+                trace("< {aToStringValue}.methodWithParameters")),
+                getLoggingEvents("methodWithParameters"));
     }
 
 	@Test
 	public void testReturnedObjectLogged() {
 		testInstance.methodThatReturns();
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.methodThatReturns");
-        assertEquals(trace("> {aToStringValue}.methodThatReturns()"), loggingEvents.get(0));
-        assertEquals(trace("< {aToStringValue}.methodThatReturns(hello)"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.methodThatReturns()"),
+                trace("< {aToStringValue}.methodThatReturns(hello)")),
+                getLoggingEvents("methodThatReturns"));
     }
 
 	@Test
 	public void testNullReturnedObjectHandledOK() {
 		testInstance.methodThatReturnsNull();
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.methodThatReturnsNull");
-        assertEquals(trace("> {aToStringValue}.methodThatReturnsNull()"), loggingEvents.get(0));
-        assertEquals(trace("< {aToStringValue}.methodThatReturnsNull(null)"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.methodThatReturnsNull()"),
+                trace("< {aToStringValue}.methodThatReturnsNull(null)")),
+                getLoggingEvents("methodThatReturnsNull"));
     }
 
 	@Test
 	public void testArrayParametersTurnedIntoSomethingLegible() {
 		testInstance.methodWithArrayParameter(new String[] {"hello", "world"});
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.methodWithArrayParameter");
-		assertEquals(trace("> {aToStringValue}.methodWithArrayParameter(strings={hello,world})"), loggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.methodWithArrayParameter"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.methodWithArrayParameter(strings={hello,world})"),
+                trace("< {aToStringValue}.methodWithArrayParameter")),
+                getLoggingEvents("methodWithArrayParameter"));
     }
 
 	@Test
 	public void testReturnedArrayTurnedIntoSomethingLegible() {
 		testInstance.methodWithArrayReturnType();
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.methodWithArrayReturnType");
-		assertEquals(trace("> {aToStringValue}.methodWithArrayReturnType()"), loggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.methodWithArrayReturnType({hello,world})"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.methodWithArrayReturnType()"),
+                trace("< {aToStringValue}.methodWithArrayReturnType({hello,world})")),
+                getLoggingEvents("methodWithArrayReturnType"));
     }
 
 	@Test
@@ -146,10 +154,11 @@ public class TestTraceLogging {
 		try {
 			new ClassToBeTraced("exceptionMessage");
 		} catch (RuntimeException re) {}
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.<init>");
-		assertEquals(trace("> ClassToBeTraced(message=exceptionMessage)"), loggingEvents.get(0));
-		assertEquals(trace("! ClassToBeTraced threw exception java.lang.RuntimeException: exceptionMessage at line 17"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> ClassToBeTraced(message=exceptionMessage)"),
+                trace("! ClassToBeTraced threw exception java.lang.RuntimeException: exceptionMessage at line 17")),
+                getLoggingEvents("<init>"));
     }
 
 	@Test
@@ -157,69 +166,72 @@ public class TestTraceLogging {
 		try {
 			testInstance.nestedExceptionMethod();
 		} catch (RuntimeException re) {}
-        List<LoggingEvent> loggingEvents1 = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.nestedExceptionMethod");
-        List<LoggingEvent> loggingEvents2 = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.runtimeExceptionMethod");
-		assertEquals(trace("> {aToStringValue}.nestedExceptionMethod()"), loggingEvents1.get(0));
-		assertEquals(trace("> {aToStringValue}.runtimeExceptionMethod()"), loggingEvents2.get(0));
-		assertEquals(trace("! {aToStringValue}.runtimeExceptionMethod threw exception java.lang.RuntimeException: message at line 29"), loggingEvents2.get(1));
-		assertEquals(trace("! {aToStringValue}.nestedExceptionMethod threw exception java.lang.RuntimeException: message at line 72"), loggingEvents1.get(1));
-        assertEquals(2, loggingEvents1.size());
-        assertEquals(2, loggingEvents2.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.nestedExceptionMethod()"),
+                trace("! {aToStringValue}.nestedExceptionMethod threw exception java.lang.RuntimeException: message at line 72")),
+                getLoggingEvents("nestedExceptionMethod"));
+		assertEquals(asList(
+                trace("> {aToStringValue}.runtimeExceptionMethod()"),
+                trace("! {aToStringValue}.runtimeExceptionMethod threw exception java.lang.RuntimeException: message at line 29")),
+                getLoggingEvents("runtimeExceptionMethod"));
     }
 
 	@Test
 	public void testFieldChangeLogged() {
 		testInstance.setAField(2);
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.aField");
-		assertEquals(trace("= {aToStringValue}.aField [1] -> [2]"), loggingEvents.get(0));
-        assertEquals(1, loggingEvents.size());
+
+        assertEquals(asList(trace("= {aToStringValue}.aField [1] -> [2]")), getLoggingEvents("aField"));
     }
 
 	@Test
 	public void testSecureParameterEscapedInMethod() {
 		testInstance.methodWithSecureParam("mypassword");
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.methodWithSecureParam");
-		assertEquals(trace("> {aToStringValue}.methodWithSecureParam(password=****)"), loggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.methodWithSecureParam"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.methodWithSecureParam(password=****)"),
+                trace("< {aToStringValue}.methodWithSecureParam")),
+                getLoggingEvents("methodWithSecureParam"));
     }
 
     @Test
 	public void testSecureParameterEscapedInConstructor() {
 		new ClassToBeTraced("mypassword", "otherparam");
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.<init>");
-		assertEquals(trace("> ClassToBeTraced(password=****, other=otherparam)"), loggingEvents.get(0));
-		assertEquals(trace("< ClassToBeTraced{aToStringValue}"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> ClassToBeTraced(password=****, other=otherparam)"),
+                trace("< ClassToBeTraced{aToStringValue}")),
+                getLoggingEvents("<init>"));
     }
 
 	@Test
 	public void testSecureMethodsReturnValueEscaped() {
 		testInstance.secureMethod();
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.secureMethod");
-		assertEquals(trace("> {aToStringValue}.secureMethod()"), loggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.secureMethod(****)"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.secureMethod()"),
+                trace("< {aToStringValue}.secureMethod(****)")),
+                getLoggingEvents("secureMethod"));
     }
 
 	@Test
 	public void testNullReturningMethod() {
 		testInstance.nullReturningMethod();
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.nullReturningMethod");
-		assertEquals(trace("> {aToStringValue}.nullReturningMethod()"), loggingEvents.get(0));
-		assertEquals(trace("< {aToStringValue}.nullReturningMethod(null)"), loggingEvents.get(1));
-        assertEquals(2, loggingEvents.size());
+
+        assertEquals(asList(
+                trace("> {aToStringValue}.nullReturningMethod()"),
+                trace("< {aToStringValue}.nullReturningMethod(null)")),
+                getLoggingEvents("nullReturningMethod"));
     }
 
 	@Test
 	public void testSecureFieldsNotLogged() {
 		testInstance.setSecureField("Hello World");
-        List<LoggingEvent> loggingEvents = getLoggingEvents("uk.org.lidalia.logging.test.ClassToBeTraced.secureField");
-        assertEquals(trace("= {aToStringValue}.secureField [****] -> [****]"), loggingEvents.get(0));
-        assertEquals(1, loggingEvents.size());
+
+        assertEquals(asList(trace("= {aToStringValue}.secureField [****] -> [****]")), getLoggingEvents("secureField"));
     }
 
     private List<LoggingEvent> getLoggingEvents(String loggerName) {
-        return TestLoggerFactory.getTestLogger(loggerName).getLoggingEvents();
+        return TestLoggerFactory.getTestLogger(ClassToBeTraced.class.getName() + "." + loggerName).getLoggingEvents();
     }
 }
