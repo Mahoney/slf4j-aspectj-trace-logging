@@ -1,5 +1,12 @@
-.classpath
-.project
-.settings
 target
 .DS_Store
+.project
+.classpath
+.settings
+.externalToolBuilders
+bin
+*.iml
+*.iws
+*.ipr
+*.ids
+.idea
