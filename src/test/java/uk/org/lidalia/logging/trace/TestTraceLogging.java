@@ -1,18 +1,17 @@
 package uk.org.lidalia.logging.trace;
 
-import static java.util.Arrays.asList;
-import static org.junit.Assert.*;
-import static uk.org.lidalia.slf4jtest.LoggingEvent.trace;
-
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
-
 import uk.org.lidalia.logging.test.ClassToBeTraced;
 import uk.org.lidalia.slf4jtest.LoggingEvent;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
+
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static uk.org.lidalia.slf4jtest.LoggingEvent.trace;
 
 public class TestTraceLogging {
 
@@ -228,7 +227,9 @@ public class TestTraceLogging {
 	public void testSecureFieldsNotLogged() {
 		testInstance.setSecureField("Hello World");
 
-        assertEquals(asList(trace("= {aToStringValue}.secureField [****] -> [****]")), getLoggingEvents("secureField"));
+        assertEquals(asList(
+                trace("= {aToStringValue}.secureField [****] -> [****]")),
+                getLoggingEvents("secureField"));
     }
 
     private List<LoggingEvent> getLoggingEvents(String loggerName) {
