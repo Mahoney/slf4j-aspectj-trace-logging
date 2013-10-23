@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import java.util.Properties;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
